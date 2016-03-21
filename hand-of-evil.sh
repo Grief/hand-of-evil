@@ -79,7 +79,7 @@ cp ../../hnd_holdcreature0042.png ../../hnd_dropcreature0042.png
 
 # Reordered animations
 reorder dance 40 41 42 43 44 43 42 41
-series pointing_hand 1 16 reordered 600 60 60 60 30
+series pointing_hand 0 9 reordered 600 60 60 60 30
 
 reorder dropcreature 42 43 44 45 46 47
 series zoom-out 8 62 reordered 300 80 80 80 80 300
@@ -115,6 +115,7 @@ rotated vertical-text  0 84 dance0052  -90
 
 # Aliases
 ln -sf size_hor       right_side
+ln -sf size_hor       left_side
 ln -sf size_hor       split_h
 ln -sf size_hor       sb_h_double_arrow
 
@@ -146,10 +147,11 @@ echo "
 GENERATION COMPLETED
 
 You can now install the theme with one of the following ways:
-1. Using GUI, i.e. in KDE choose \"cursor theme\" from menu and install from /tmp/hand-of-evil/hand-of-evil.tar.gz
+1. Using GUI, i.e. in KDE choose \"cursor theme\" from menu and install from:
+   /tmp/hand-of-evil/hand-of-evil.tar.gz
 2. Manual way is to do:
    sudo mv /tmp/hand-of-evil/hand-of-evil /usr/share/icons
    sudo update-alternatives --install /usr/share/icons/default/index.theme x-cursor-theme /usr/share/icons/hand-of-evil/index.theme 200"
 
 # Remove images
-#rm *.png
+rm *.png
