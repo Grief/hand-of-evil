@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-tmp=/tmp/hand-of-evil/hnd_tmp.png
-
-##03b6e0fcb3499374a867c041f52298f0 dnd-no-drop
+ARCHIVE=HandOfEvil.zip
+TMP=/tmp/hand-of-evil/hnd_tmp.png
 
 function prepare() {
     s=(999 999 0 0)
     for file in ../../hnd_$1*.png; do
-        d=(`convert ${file} -trim -print '%X %Y %w %h' ${tmp}`)
+        d=(`convert ${file} -trim -print '%X %Y %w %h' ${TMP}`)
         for i in 0 1; do
             j=$((i + 2))
             let d[j]+=d[i]
@@ -38,12 +37,12 @@ function single() {
 }
 
 function rotated() {
-    convert -background none -rotate $5 ../../hnd_$4.png ${tmp}
+    convert -background none -rotate $5 ../../hnd_$4.png ${TMP}
     single $1 $2 $3 tmp
 }
 
 function reorder() {
-    rm  ../../hnd_reordered*>/dev/null
+    rm  ../../hnd_reordered*>/dev/null 2>&1
     n=10
     for i in "${@:2}"; do
         cp ../../hnd_${1}00${i}.png ../../hnd_reordered${n}.png
@@ -54,12 +53,18 @@ function reorder() {
 # Download and unpack archive with images
 mkdir -p /tmp/hand-of-evil/hand-of-evil/cursors
 cd /tmp/hand-of-evil
-#wget ftp://ftp.ea-europe.com/support/patches/dk2/HandOfEvil.zip
-if [ `md5sum HandOfEvil.zip|cut -d' ' -f1` != 'c1dd086f15a91bfa08c30530d0ff1e6f' ]; then
-    echo "Failed to download HandOfEvil.zip archive"
-    exit -1
+if [ ! -f ${ARCHIVE} ]; then
+    wget -q -O ${ARCHIVE} --show-progress "ftp://ftp.ea-europe.com/support/patches/dk2/HandOfEvil.zip"
+    if [ $? != 0 ]; then
+        echo "ERROR: Failed to download ${ARCHIVE} archive"
+        exit -1
+    fi
 fi
-unzip -q -o HandOfEvil.zip
+if [ `md5sum ${ARCHIVE}|cut -d' ' -f1` != 'c1dd086f15a91bfa08c30530d0ff1e6f' ]; then
+    echo "ERROR: ${ARCHIVE} archive checksum mismatch"
+    exit -2
+fi
+unzip -q -o ${ARCHIVE}
 
 # Prepare layout and create index file
 cd hand-of-evil
@@ -74,7 +79,7 @@ cp ../../hnd_holdcreature0042.png ../../hnd_dropcreature0042.png
 
 # Reordered animations
 reorder dance 40 41 42 43 44 43 42 41
-series pointing_hand 1 16 reordered 300 60 60 60 30
+series pointing_hand 1 16 reordered 600 60 60 60 30
 
 reorder dropcreature 42 43 44 45 46 47
 series zoom-out 8 62 reordered 300 80 80 80 80 300
@@ -95,10 +100,11 @@ single  left_ptr    0  3 point0040
 single  size_ver    8 40 holdcreature0042
 single  cross      31 32 possess
 single  whats_this  0 13 usedigger0041
-#single  dnd-none    5 39 grab0040
-single  dnd-none     2 1 holdgold0040
-single  ibeam        0 0 dance0052
-single  forbidden   15 8 dropcreature0046
+single  dnd-none    2  1 holdgold0040
+single  ibeam       0  0 dance0052
+single  forbidden   0 14 dance0044
+single  openhand    3 14 castspell0051
+single  closedhand  1  5 slap0051
 
 # Rotated cursors
 rotated size_hor   40 65 holdcreature0042 -90
@@ -121,6 +127,7 @@ ln -sf size_ver       sb_v_double_arrow
 
 ln -sf cross          crosshair
 ln -sf pointing_hand  hand2
+ln -sf forbidden      not-allowed
 ln -sf left_ptr_watch progress
 ln -sf wait           watch
 ln -sf ibeam          xterm
@@ -135,7 +142,9 @@ ln -sf forbidden      03b6e0fcb3499374a867c041f52298f0
 cd /tmp/hand-of-evil
 tar czf hand-of-evil.tar.gz hand-of-evil
 
-echo "GENERATION COMPLETED
+echo "
+GENERATION COMPLETED
+
 You can now install the theme with one of the following ways:
 1. Using GUI, i.e. in KDE choose \"cursor theme\" from menu and install from /tmp/hand-of-evil/hand-of-evil.tar.gz
 2. Manual way is to do:
