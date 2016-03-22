@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
+DIR="$(dirname "$(realpath "$0")")"
 ARCHIVE=HandOfEvil.zip
-TMP=/tmp/hand-of-evil/hnd_tmp.png
+TMP="${DIR}/hnd_tmp.png"
 
 function prepare() {
     s=(999 999 0 0)
@@ -51,8 +52,8 @@ function reorder() {
 }
 
 # Download and unpack archive with images
-mkdir -p /tmp/hand-of-evil/hand-of-evil/cursors
-cd /tmp/hand-of-evil
+mkdir -p "${DIR}/hand-of-evil/cursors"
+cd "${DIR}"
 if [ ! -f ${ARCHIVE} ]; then
     wget -q -O ${ARCHIVE} --show-progress "ftp://ftp.ea-europe.com/support/patches/dk2/HandOfEvil.zip"
     if [ $? != 0 ]; then
@@ -127,6 +128,8 @@ ln -sf size_ver       fleur
 ln -sf size_ver       sb_v_double_arrow
 
 ln -sf cross          crosshair
+ln -sf cross          color-picker
+
 ln -sf pointing_hand  hand2
 ln -sf forbidden      not-allowed
 ln -sf left_ptr_watch progress
@@ -140,7 +143,7 @@ ln -sf zoom-out       f41c0e382c97c0938e07017e42800402
 ln -sf forbidden      03b6e0fcb3499374a867c041f52298f0
 
 # Build archive
-cd /tmp/hand-of-evil
+cd "${DIR}"
 tar czf hand-of-evil.tar.gz hand-of-evil
 
 echo "
@@ -148,9 +151,9 @@ GENERATION COMPLETED
 
 You can now install the theme with one of the following ways:
 1. Using GUI, i.e. in KDE choose \"cursor theme\" from menu and install from:
-   /tmp/hand-of-evil/hand-of-evil.tar.gz
+   ${DIR}/hand-of-evil.tar.gz
 2. Manual way is to do:
-   sudo mv /tmp/hand-of-evil/hand-of-evil /usr/share/icons
+   sudo mv ${DIR}/hand-of-evil /usr/share/icons
    sudo update-alternatives --install /usr/share/icons/default/index.theme x-cursor-theme /usr/share/icons/hand-of-evil/index.theme 200"
 
 # Remove images
