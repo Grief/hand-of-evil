@@ -26,7 +26,7 @@ function error() {
 
 function process() {
     tmp=$(printf "${DIR}/tmp%04d.png" "${index}")
-    d=($(convert "${file}" -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" -trim -print '%X %Y %w %h %W %H' "${tmp}" 2>&1))
+    d=($(convert "${file}" -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" "${effect_args[@]}" -trim -print '%X %Y %w %h %W %H' "${tmp}" 2>&1))
     if [ -n "${rotate_arg}" ]; then
         hot_point=($(echo "${hot_point[@]} ${ANGLE} ${d[@]:0:2} ${d[@]:6:2}"|awk '{xd=$1-($4-1)/2; yd=$2-($5-1)/2; a=$3*atan2(0,-1)/180; c=cos(a); s=sin(a); printf("%.0f %.0f", ($6-1)/2+xd*c-yd*s, ($7-1)/2+yd*c+xd*s)}'))
     fi
@@ -59,6 +59,11 @@ function conf() {
         rotate_arg=( -background none -rotate "${ANGLE}" +repage)
     else
         rotate_arg=()
+    fi
+    if [ -n "${EFFECT}" ]; then
+        readarray -t effect_args < <( echo ${EFFECT[@]}|xargs -n 1 echo )
+    else
+        effect_args=()
     fi
     index=1
     max_size=0
@@ -103,6 +108,7 @@ function map() {
         '!file-mask') FILE_MASK="$2"; return ;;
         '!do') DO=("${@:2}"); return ;;
         '!rotate') ANGLE="$2"; return ;;
+        '!effect') EFFECT=("${@:2}"); return ;;
         '!alias') ln -sf "$3" "../../$2"; return ;;
         !*) error "Unknown option: ${1}"; return ;;
     esac
