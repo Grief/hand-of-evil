@@ -26,7 +26,7 @@ function error() {
 
 function process() {
     tmp=$(printf "${DIR}/tmp%04d.png" "${index}")
-    d=($(convert "${file}" -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" "${effect_args[@]}" -trim -print '%X %Y %w %h %W %H' "${tmp}" 2>&1))
+    d=($(convert "${file}" -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" "${effect_args[@]}" -trim -print '%X %Y %w %h %W %H' +repage "${tmp}" 2>&1))
     if [ -n "${rotate_arg}" ]; then
         hot_point=($(echo "${hot_point[@]} ${ANGLE} ${d[@]:0:2} ${d[@]:6:2}"|awk '{xd=$1-($4-1)/2; yd=$2-($5-1)/2; a=$3*atan2(0,-1)/180; c=cos(a); s=sin(a); printf("%.0f %.0f", ($6-1)/2+xd*c-yd*s, ($7-1)/2+yd*c+xd*s)}'))
     fi
@@ -34,18 +34,7 @@ function process() {
         let hot_point[i]-=d[i+2]
     done
     unset extent
-    for i in 0 1; do
-        if (( hot_point[i] < 0 )); then
-            let d[i+4]-=hot_point[i]
-            hot_point[i]=0
-            extent=true
-        fi
-    done
-    if [ -n extent ]; then
-        mogrify -background none -gravity SouthEast -extent "${d[4]}x${d[5]}" "${tmp}"
-    fi
-    size=$(( d[4] > d[5] ? d[4] : d[5] ))
-    echo "${size} ${hot_point[0]} ${hot_point[1]} ${tmp}"
+    echo "${d[4]} ${d[5]} ${hot_point[0]} ${hot_point[1]} ${index}"
 }
 
 function conf() {
@@ -66,7 +55,7 @@ function conf() {
         effect_args=()
     fi
     index=1
-    max_size=0
+    max=(0 0 0 0)
     declare -A processed
     for ((f = 1; f <= $#; f++)); do
         if [[ ! "${!f}" =~ ^(\*|[0-9]+)(:([0-9]+))?$ ]]; then return 100; fi
@@ -85,18 +74,31 @@ function conf() {
                 continue
             fi
             line=($(process))
-            size="${line[0]}"
-            if (( max_size < size )); then
-                let max_size=size
-            fi
-            line="${line[@]:1}"
+            for i in 0 1 2 3; do
+                if (( line[i] > max[i] )); then
+                    let max[i]=line[i]
+                fi
+            done
+
+            line="${line[@]}"
             config+=("${line} ${delay}")
             processed["${file}"]="${line}"
             let index++
         done
     done
+    size=$(( max[0] > max[1] ? max[0] : max[1] ))
+
+    unset processed
+    declare -A processed
     for ((f = 0; f < "${#config[@]}"; f++)); do
-        echo ${max_size} "${config[f]}"
+        args=(${config[f]})
+        tmp=$(printf "${DIR}/tmp%04d.png" "${args[4]}")
+        line="${size} ${max[2]} ${max[3]} ${tmp} ${args[5]}"
+        echo "${line}"
+        if [ -z "${processed["${args[4]}"]}" ]; then
+            mogrify -background none -extent "$((args[0]+max[2]-args[2]))x$((args[1]+max[3]-args[3]))-$((max[2]-args[2]))-$((max[3]-args[3]))" "${tmp}"
+            processed["${args[4]}"]=true
+        fi
     done
 }
 
