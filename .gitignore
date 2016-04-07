@@ -1,4 +1,5 @@
-*
+/*
 !.gitignore
-!hand-of-evil.sh
-!mapping.conf
+!/hand-of-evil.sh
+!/mapping.conf
+!/previews
