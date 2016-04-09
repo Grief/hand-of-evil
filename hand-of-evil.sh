@@ -4,8 +4,6 @@ DIR="$(dirname "$(realpath "$0")")"
 CURSORS="${DIR}/hand-of-evil/cursors"
 PREVIEWS="${DIR}/previews"
 ARCHIVE="${DIR}/HandOfEvil.zip"
-TMP="${DIR}/tmp.png"
-TMP="${DIR}/tmp.png"
 MAPPING_CONF='mapping.conf'
 FIELDS=(name hot_point prefix frame)
 MESSAGES=(
@@ -89,19 +87,6 @@ function conf() {
         done
     done
     size=$(( max[0] > max[1] ? max[0] : max[1] ))
-
-    unset processed
-    declare -A processed
-    for ((f = 0; f < "${#config[@]}"; f++)); do
-        args=(${config[f]})
-        tmp=$(printf "tmp%04d.png" "${args[4]}")
-        line="${size} ${max[2]} ${max[3]} ${tmp} ${args[5]}"
-        echo "${line}"
-        if [ -z "${processed["${args[4]}"]}" ]; then
-            mogrify -background none -extent "$((args[0]+max[2]-args[2]))x$((args[1]+max[3]-args[3]))-$((max[2]-args[2]))-$((max[3]-args[3]))" "${tmp}"
-            processed["${args[4]}"]=true
-        fi
-    done
 }
 
 function map() {
@@ -114,6 +99,7 @@ function map() {
         '!file-mask') FILE_MASK="$2"; return ;;
         '!do') DO=("${@:2}"); return ;;
         '!rotate') ANGLE="$2"; return ;;
+        '!sizes') SIZES=("${@:2}"); return ;;
         '!effect') EFFECT=("${@:2}"); return ;;
         '!alias') ln -sf "$3" "$2"; return ;;
         !*) error "Unknown option: ${1}"; return ;;
@@ -139,7 +125,7 @@ function map() {
             error "${MESSAGES[k]}"; return
         fi
     done
-    config="$(conf "${@:i+1}")"
+    conf "${@:i+1}"
     code=$?
     if [ ${code} -eq 0 ]; then
         echo "    Generating ${name}..."
@@ -187,21 +173,42 @@ Generation completed."
     rm *.png
 }
 
+function scale_percent() {
+    echo "$1 ${2::-1}"|awk '{printf("%.0f", $1 * $2 / 100)}'
+}
+
 function xcursor() {
-    echo "${config}"|xcursorgen - "${name}"
+    for ((s = 0; s < "${#SIZES[@]}"; s++)); do
+        unset processed
+        declare -A processed
+        scale="${SIZES[s]}"
+        hot_point=()
+        for i in 2 3; do
+            hot_point[i-2]=$(scale_percent "${max[i]}" "${scale}")
+        done
+
+        for ((f = 0; f < "${#config[@]}"; f++)); do
+            args=(${config[f]})
+            tmp=$(printf "tmp%04d-%s.png" "${args[4]}" "${s}")
+            echo "$(scale_percent "${size}" "${scale}") ${hot_point[@]} ${tmp} ${args[5]}"
+            if [ -z "${processed["${args[4]}"]}" ]; then
+                convert "$(printf "tmp%04d.png" "${args[4]}")" -background none -extent "$((args[0]+max[2]-args[2]))x$((args[1]+max[3]-args[3]))-$((max[2]-args[2]))-$((max[3]-args[3]))" -resize "${scale}" +repage "${tmp}"
+                processed["${args[4]}"]=true
+            fi
+        done
+    done|xcursorgen - "${name}"
 }
 
 function gif() {
     echo "${name}|![${name}](previews/${name}.gif)">>"${DIR}/previews.md"
     unset cmd
-    while read -ra args
-    do
-        if [ -n "${args[4]}" ]; then
-            cmd+=("-delay" "$((args[4] / 10))")
+    for ((f = 0; f < "${#config[@]}"; f++)); do
+        args=(${config[f]})
+        if [ -n "${args[5]}" ]; then
+            cmd+=('-delay' "$((args[5] / 10))" '-page' "+$((max[2] - args[2]))+$((max[3] - args[3]))")
         fi
-        cmd+=("${args[3]}")
-    done < <(echo "${config}")
-
+        cmd+=("$(printf "tmp%04d.png" "${args[4]}")")
+    done
     convert -dispose Background "${cmd[@]}" -layers trim-bounds "${name}.gif"
 }
 
