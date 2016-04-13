@@ -1,7 +1,7 @@
 # Hand of Evil
 Xcursor theme based on **Dungeon Keeper II** in-game cursors.
 
-You can see how **default**, **pointing hand** (it appears when you hover the mouse over a hyperlink, for example) and **wait** (hourglass) cursors looks like. 
+You can see how **default**, **pointing hand** (it appears when you hover the mouse over a hyperlink, for example) and **wait** (hourglass) cursors look like. 
 
 *Please note, that gif images suffer some loss of the quality, especcially for semitransparent gradient transitions.*
 
