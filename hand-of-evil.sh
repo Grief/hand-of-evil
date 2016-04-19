@@ -26,7 +26,10 @@ function error() {
 
 function process() {
     tmp=$(printf "tmp%04d.png" "${index}")
-    d=($(convert "${file}" -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" "${effect_args[@]}" -trim -print '%X %Y %w %h %W %H' +repage "${tmp}" 2>&1))
+    d=($(convert "${file}" ${FLOP} -print '%W %H ' "${rotate_arg[@]}" "${do_args[@]}" "${effect_args[@]}" -trim -print '%X %Y %w %h %W %H' +repage "${tmp}" 2>&1))
+    if [ -n "${FLOP}" ]; then
+        let hot_point[0]=d[0]-hot_point[0]
+    fi
     if [ -n "${rotate_arg}" ]; then
         hot_point=($(echo "${hot_point[@]} ${ANGLE} ${d[@]:0:2} ${d[@]:6:2}"|awk '{xd=$1-($4-1)/2; yd=$2-($5-1)/2; a=$3*atan2(0,-1)/180; c=cos(a); s=sin(a); printf("%.0f %.0f", ($6-1)/2+xd*c-yd*s, ($7-1)/2+yd*c+xd*s)}'))
     fi
@@ -99,6 +102,7 @@ function map() {
         '!file-mask') FILE_MASK="$2"; return ;;
         '!do') DO=("${@:2}"); return ;;
         '!rotate') ANGLE="$2"; return ;;
+        '!flop') FLOP="-flop"; return ;;
         '!sizes') SIZES=("${@:2}"); return ;;
         '!effect') EFFECT=("${@:2}"); return ;;
         '!alias') ln -sf "$3" "$2"; return ;;
@@ -130,7 +134,7 @@ function map() {
     if [ ${code} -eq 0 ]; then
         echo "    Generating ${name}..."
         ${target_format}
-        unset DO ANGLE
+        unset DO ANGLE FLOP
     else
         error "${MESSAGES[code]}"
     fi
