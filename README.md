@@ -18,7 +18,7 @@ I asked Electronic Arts for the permission to create and share this theme and th
 
 You can find the package ready for the installation in Gnome, KDE and other desktop environments in [releases section](https://github.com/Grief/hand-of-evil/releases).
 
-The package is uploaded to [opendesktop.org](http://opendesktop.org/content/show.php/Hand+of+Evil?content=175746) as well, so you can install it from there, e.g. if you use KDE, open `System Settings`, navigate to `Cursor Theme`, click `Get New Theme...` button, search for `Hand of Evil` and install it.
+The package is uploaded to [opendesktop.org](http://opendesktop.org/content/show.php/Hand+of+Evil?content=175746) (opendekstop.org is reconstructing, so here is the link to [gnome-look.org](https://www.gnome-look.org/p/999427/)) as well, so you can install it from there, e.g. if you use KDE, open `System Settings`, navigate to `Cursor Theme`, click `Get New Theme...` button, search for `Hand of Evil` and install it.
 
 ## Customization
 
