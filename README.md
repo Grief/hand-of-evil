@@ -3,7 +3,7 @@ Xcursor theme based on **Dungeon Keeper II** in-game cursors.
 
 You can see how **default**, **pointing hand** (it appears when you hover the mouse over a hyperlink, for example) and **wait** (hourglass) cursors look like. 
 
-*Please note, that gif images suffer some loss of the quality, especcially for semitransparent gradient transitions.*
+*Please note, that gif images suffer some loss of the quality, especially for semitransparent gradient transitions.*
 
 ![left_ptr](previews/left_ptr.gif) ![pointing_hand](previews/pointing_hand.gif) ![wait](previews/wait.gif)
 
