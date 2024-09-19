@@ -47,7 +47,7 @@ type CursorDimensions = {
 type CursorInfo = {
   name: string;
   max: CursorDimensions;
-  config: Frame[];
+  frameData: Frame[];
   size: number;
 };
 
@@ -163,7 +163,7 @@ function convert({ frames, prefix, hotPoint, name }: Cursor): CursorInfo {
   let max: CursorDimensions = { width: 0, height: 0, hotX: 0, hotY: 0 };
   const processed: Record<string, Frame> = {};
 
-  const config: Frame[] = [];
+  const frameData: Frame[] = [];
   let delay: number;
 
   for (const frame of frames) {
@@ -179,7 +179,8 @@ function convert({ frames, prefix, hotPoint, name }: Cursor): CursorInfo {
     if (strDelay) delay = Number(strDelay);
     for (let file of files) {
       if (processed[file]) {
-        if (suffix !== '*') config.push({ ...processed[file], delay: delay });
+        if (suffix !== '*')
+          frameData.push({ ...processed[file], delay: delay });
         continue;
       }
 
@@ -200,13 +201,13 @@ function convert({ frames, prefix, hotPoint, name }: Cursor): CursorInfo {
         ...result,
         delay: delay,
       };
-      config.push(frame);
+      frameData.push(frame);
       processed[file] = frame;
       index++;
     }
   }
 
-  return { max, config, size: Math.max(max.width, max.height), name };
+  return { max, frameData, size: Math.max(max.width, max.height), name };
 }
 
 function processLine(type: 'xcursor' | 'gif', line: string) {
@@ -317,7 +318,7 @@ function scale_percent(a: number, b: string) {
   return Math.round((a * Number(b.slice(0, -1))) / 100);
 }
 
-function xcursor({ max, size, config, name }: CursorInfo) {
+function xcursor({ max, size, frameData, name }: CursorInfo) {
   const configLines: string[] = [];
   for (let s = 0; s < Config.SIZES.length; s++) {
     let scale = Config.SIZES[s];
@@ -325,22 +326,25 @@ function xcursor({ max, size, config, name }: CursorInfo) {
     const hotX = scale_percent(max.hotX, scale);
     const hotY = scale_percent(max.hotY, scale);
 
-    for (let { delay, index, width, height, hotX: chx, hotY: chy } of config) {
+    for (let frame of frameData) {
+      let { delay, index, width, height, hotX: chx, hotY: chy } = frame;
       const tmp = printf('tmp%04d-%s.png', index, s);
       let scaledSize = scale_percent(size, scale);
       let strDelay = delay ? delay : '';
       const xcursorLine = `${scaledSize} ${hotX} ${hotY} ${tmp} ${strDelay}`;
       configLines.push(xcursorLine);
       if (!processed[index]) {
-        const args0 = width;
-        const args1 = height;
-        const args2 = chx;
-        const args3 = chy;
-        const max2 = max.hotX;
-        const max3 = max.hotY;
-        execSync(
-          `convert ${printf('tmp%04d.png', index)} -background none -extent ${args0 + max2 - args2}x${args1 + max3 - args3}-${max2 - args2}-${max3 - args3} -resize ${scale} +repage ${tmp}`,
-        );
+        const extentWidth = width + max.hotX - chx;
+        const extentHeight = height + max.hotY - chy;
+        let result = '';
+        try {
+          result = execSync(
+            `convert ${printf('tmp%04d.png', index)} -background none -extent ${extentWidth}x${extentHeight}-${max.hotX - chx}-${max.hotY - chy} -resize ${scale} +repage ${tmp}`,
+          ).toString();
+        } catch (e) {
+          console.error(result);
+          exit(2);
+        }
         processed[index] = true;
       }
     }
@@ -348,22 +352,17 @@ function xcursor({ max, size, config, name }: CursorInfo) {
   execSync(`xcursorgen - ${name}`, { input: configLines.join('\n') });
 }
 
-function gif({ name, config, max }: CursorInfo) {
+function gif({ name, frameData, max }: CursorInfo) {
   appendFileSync(
     join(DIR, 'previews.md'),
     `${name}|![${name}](previews/${name}.gif)\n`,
   );
   const cmd: string[] = [];
-  for (let { delay, index, width, height, hotX: chx, hotY: chy } of config) {
-    const args0 = width;
-    const args1 = height;
-    const args2 = chx;
-    const args3 = chy;
-    const max2 = max.hotX;
-    const max3 = max.hotY;
-
+  for (let { delay, index, hotX: chx, hotY: chy } of frameData) {
     if (delay)
-      cmd.push(`-delay ${delay / 10} -page +${max2 - args2}+${max3 - args3}`);
+      cmd.push(
+        `-delay ${delay / 10} -page +${max.hotX - chx}+${max.hotY - chy}`,
+      );
     cmd.push(printf('tmp%04d.png', index));
   }
   execSync(
