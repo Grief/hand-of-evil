@@ -1,7 +1,3 @@
-/*
-!.gitignore
-!LICENSE
-!README.md
-!/hand-of-evil.sh
-!/mapping.conf
-!/previews*
+.idea
+node_modules/
+hand-of-evil.tar.gz

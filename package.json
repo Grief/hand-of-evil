@@ -1,0 +1,17 @@
+{
+  "name": "hand-of-evil",
+  "version": "1.0.0",
+  "repository": "git@github.com:Grief/hand-of-evil.git",
+  "author": "Grief <iamgrief@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "xcursor": "./hand-of-evil.ts xcursor",
+    "previews": "./hand-of-evil.ts gif"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "prettier": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  }
+}
