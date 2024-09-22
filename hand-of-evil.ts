@@ -88,6 +88,15 @@ function printf(format: string, ...args: any) {
   });
 }
 
+function execConvert(args: string[]) {
+  const command = `convert ${args.join(' ')}`;
+  try {
+    return execSync(command);
+  } catch (e) {
+    throw Error(`command failed: ${command}`);
+  }
+}
+
 function processImage(
   { flop, angle, extra }: Cursor,
   { index, file, hotPoint }: ProcessImageParams,
@@ -105,9 +114,18 @@ function processImage(
     height,
     pageWidth,
     pageHeight,
-  ] = execSync(
-    `convert "${file}" ${flop ?? ''} -print '%W %H ' ${angle ? `-background none -rotate ${angle} +repage` : ''} ${extra ?? ''} ${effect} -trim -print '%X %Y %w %h %W %H' +repage "${tmp}"`,
-  )
+  ] = execConvert([
+    `${file}`,
+    flop ?? '',
+    "-print '%W %H '",
+    angle ? `-background none -rotate ${angle} +repage` : '',
+    extra ?? '',
+    effect,
+    '-trim',
+    "-print '%X %Y %w %h %W %H'",
+    '+repage',
+    `"${tmp}"`,
+  ])
     .toString()
     .split(' ')
     .map(Number);
@@ -253,9 +271,14 @@ function xcursor({ name }: Cursor, { max, size, frameData }: CursorInfo) {
         const extentHeight = height + max.hotY - chy;
         let result = '';
         try {
-          result = execSync(
-            `convert ${printf('tmp%04d.png', index)} -background none -extent ${extentWidth}x${extentHeight}-${max.hotX - chx}-${max.hotY - chy} -resize ${scale} +repage ${tmp}`,
-          ).toString();
+          result = execConvert([
+            printf('tmp%04d.png', index),
+            '-background none',
+            `-extent ${extentWidth}x${extentHeight}-${max.hotX - chx}-${max.hotY - chy}`,
+            `-resize ${scale}`,
+            '+repage',
+            `${tmp}`,
+          ]).toString();
         } catch (e) {
           console.error(result);
           exit(2);
@@ -280,9 +303,12 @@ function gif({ name }: Cursor, { frameData, max }: CursorInfo) {
       );
     cmd.push(printf('tmp%04d.png', index));
   }
-  execSync(
-    `convert -dispose Background ${cmd.join(' ')} -layers trim-bounds ${name}.gif`,
-  );
+  execConvert([
+    '-dispose Background',
+    ...cmd,
+    '-layers trim-bounds',
+    `${name}.gif`,
+  ]);
 }
 
 switch (command) {
