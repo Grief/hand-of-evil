@@ -1,16 +1,17 @@
 {
-  "sizes":    ["200%", "100%", "48.19%", "38.55%", "28.91%"],
-  "sizesPx":  ["166", "83", "40", "32", "24"],
-  "fileName": "hnd_%s%04d.png",
-  "fileMask": "hnd_%s%s.png",
-  "aliases":  {
+  "applyEffects": [],
+  "sizes":        ["200%", "100%", "48.19%", "38.55%", "28.91%"],
+  "sizesPx":      ["166", "83", "40", "32", "24"],
+  "fileName":     "hnd_%s%04d.png",
+  "fileMask":     "hnd_%s%s.png",
+  "aliases":      {
     "hnd_dropcreature0042.png": "hnd_holdcreature0042.png",
     "hnd_possess0001.png":      "hnd_possess.png"
   },
-  "effects":  {
+  "effects":      {
     "outline": "\\(  +clone -blur x1 +level-colors white \\) -compose DstOver -composite"
   },
-  "cursors":  {
+  "cursors":      {
     "cross":          {
       "aliases":  ["crosshair", "color-picker", "X_cursor"],
       "frames":   ["1"],

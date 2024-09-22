@@ -13,7 +13,7 @@ import { chdir, exit } from 'process';
 import { createHash } from 'crypto';
 import { execSync } from 'node:child_process';
 
-import NewConfig from './hand-of-evil.json';
+import Cursors from './hand-of-evil.json';
 
 const [, script, command] = process.argv;
 
@@ -94,7 +94,9 @@ function processImage(
   { index, file, hotPoint }: ProcessImageParams,
 ): ProcessResult {
   const tmp = printf('tmp%04d.png', index);
-  const effect = ''; // NewConfig.effects.outline
+  const effect = Cursors.applyEffects
+    .map((effect) => Cursors.effects[effect])
+    .join(' ');
   let [
     origWidth,
     origHeight,
@@ -145,9 +147,9 @@ function convert(cursor: Cursor): CursorInfo {
     const files =
       suffix === '*'
         ? readdirSync('.').filter((name) =>
-            name.match(printf(NewConfig.fileMask, prefix, '.*')),
+            name.match(printf(Cursors.fileMask, prefix, '.*')),
           )
-        : [printf(NewConfig.fileName, prefix, suffix)];
+        : [printf(Cursors.fileName, prefix, suffix)];
     if (strDelay) delay = Number(strDelay);
     for (let file of files) {
       if (processed[file]) {
@@ -218,10 +220,10 @@ function generate(type: 'xcursor' | 'gif') {
   chdir(dir);
   execSync(`unzip -q -o "${ARCHIVE}"`, { stdio: 'inherit' });
 
-  for (let [path, target] of Object.entries(NewConfig.aliases))
+  for (let [path, target] of Object.entries(Cursors.aliases))
     symlinkSync(target, path);
 
-  for (let [name, entry] of Object.entries(NewConfig.cursors))
+  for (let [name, entry] of Object.entries(Cursors.cursors))
     convertCursor(type, { name, ...entry });
 
   console.info('\nGeneration completed.');
@@ -236,8 +238,8 @@ function scale_percent(a: number, b: string) {
 
 function xcursor({ max, size, frameData, name }: CursorInfo) {
   const configLines: string[] = [];
-  for (let s = 0; s < NewConfig.sizes.length; s++) {
-    let scale = NewConfig.sizes[s];
+  for (let s = 0; s < Cursors.sizes.length; s++) {
+    let scale = Cursors.sizes[s];
     const processed: Record<number, any> = {};
     const hotX = scale_percent(max.hotX, scale);
     const hotY = scale_percent(max.hotY, scale);
