@@ -86,14 +86,14 @@
       "angle":    -90
     },
     "size_fdiag":     {
-      "aliases":  ["top_left_corner", "bottom_right_corner", "nw-resize", "se-resize"],
+      "aliases":  ["top_left_corner", "bottom_right_corner", "nw-resize", "se-resize", "nwse-resize", "38c5dff7c7b8962045400281044508d2"],
       "frames":   ["42"],
       "hotPoint": [25, 66],
       "prefix":   "holdcreature",
       "angle":    -45
     },
     "size_bdiag":     {
-      "aliases":  ["top_right_corner", "bottom_left_corner", "ne-resize", "sw-resize"],
+      "aliases":  ["top_right_corner", "bottom_left_corner", "ne-resize", "sw-resize", "nesw-resize", "50585d75b494802d0151028115016902"],
       "frames":   ["42"],
       "hotPoint": [25, 66],
       "prefix":   "holdcreature",
