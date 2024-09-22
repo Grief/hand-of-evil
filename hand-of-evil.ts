@@ -15,9 +15,9 @@ import { execSync } from 'node:child_process';
 
 const [, script, command] = process.argv;
 
-const DIR = dirname(script);
-const CURSORS = join(DIR, 'hand-of-evil', 'cursors');
-const PREVIEWS = join(DIR, 'previews');
+const RootDir = dirname(script);
+const CURSORS = join(RootDir, 'hand-of-evil', 'cursors');
+const PREVIEWS = join(RootDir, 'previews');
 const MAPPING_CONF = 'mapping.conf';
 
 const ReEmptyLine = /^\s*(?:#.*)?$/;
@@ -27,7 +27,7 @@ const Spaces = /\s+/;
 const RePrintF = /%([^a-z%]*)([a-z%])/g;
 const RePrintFormatSpecifier = /^([-+ #0])?([0-9]+|\*)?(?:\.([0-9]+))?$/;
 
-const ARCHIVE = join(DIR, 'HandOfEvil.zip');
+const ARCHIVE = join(RootDir, 'HandOfEvil.zip');
 
 type Cursor = {
   name: string;
@@ -270,9 +270,16 @@ function processLine(type: 'xcursor' | 'gif', line: string) {
       gif(info);
       break;
   }
+  let result = {
+    ...cursor,
+    do: Config.DO,
+    angle: Config.ANGLE,
+    flop: Config.FLOP,
+  };
   Config.DO = '';
   Config.ANGLE = 0;
   Config.FLOP = '';
+  return result;
 }
 
 function generate(type: 'xcursor' | 'gif') {
@@ -297,10 +304,31 @@ function generate(type: 'xcursor' | 'gif') {
   chdir(dir);
   execSync(`unzip -q -o "${ARCHIVE}"`, { stdio: 'inherit' });
 
-  for (let line of readFileSync(join(DIR, MAPPING_CONF), 'utf8').split('\n')) {
-    processLine(type, line);
+  const obj = {};
+
+  for (let line of readFileSync(join(RootDir, MAPPING_CONF), 'utf8').split(
+    '\n',
+  )) {
+    let cursor = processLine(type, line);
+
+    if (cursor) obj[cursor.name] = { ...cursor, name: undefined };
+
     Config.LINE++;
   }
+
+  let content = `{${Object.entries(obj)
+    .map(
+      ([name, config]) =>
+        `"${name}": {\n${Object.entries(config)
+          .filter(
+            ([, value]) =>
+              value && (Array.isArray(value) ? value.length > 0 : true),
+          )
+          .map(([field, value]) => `  "${field}": ${JSON.stringify(value)}`)
+          .join(',\n')}\n}`,
+    )
+    .join(',\n')}}`;
+  writeFileSync(join(RootDir, 'hand-of-evil.json'), content);
 
   if (Config.ERRORS === 0) console.info('\nGeneration completed.');
   else
@@ -354,7 +382,7 @@ function xcursor({ max, size, frameData, name }: CursorInfo) {
 
 function gif({ name, frameData, max }: CursorInfo) {
   appendFileSync(
-    join(DIR, 'previews.md'),
+    join(RootDir, 'previews.md'),
     `${name}|![${name}](previews/${name}.gif)\n`,
   );
   const cmd: string[] = [];
@@ -383,15 +411,15 @@ switch (command) {
     execSync('tar czf hand-of-evil.tar.gz hand-of-evil', { stdio: 'inherit' });
     console.log(`You can now install the theme with one of the following ways:
 1. Using GUI, i.e. in KDE choose \"cursor theme\" from menu and install from:
-${DIR}/hand-of-evil.tar.gz
+${RootDir}/hand-of-evil.tar.gz
 2. Manual way is to do:
-  sudo mv ${DIR}/hand-of-evil /usr/share/icons
+  sudo mv ${RootDir}/hand-of-evil /usr/share/icons
 sudo update-alternatives --install /usr/share/icons/default/index.theme x-cursor-theme /usr/share/icons/hand-of-evil/index.theme 200`);
     break;
   }
   case 'gif': {
     console.log('Generating GIF previews...');
-    writeFileSync(join(DIR, 'previews.md'), 'name|preview\n---|---\n');
+    writeFileSync(join(RootDir, 'previews.md'), 'name|preview\n---|---\n');
     generate('gif');
     for (let dirent of readdirSync('.', { withFileTypes: true })) {
       if (dirent.isSymbolicLink()) rmSync(dirent.name);
