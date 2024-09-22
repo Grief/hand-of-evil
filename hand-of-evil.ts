@@ -47,7 +47,6 @@ type CursorDimensions = {
 };
 
 type CursorInfo = {
-  name: string;
   max: CursorDimensions;
   frameData: Frame[];
   size: number;
@@ -132,7 +131,7 @@ function processImage(
 }
 
 function convert(cursor: Cursor): CursorInfo {
-  const { frames, prefix, hotPoint, name } = cursor;
+  const { frames, prefix, hotPoint } = cursor;
   let index = 1;
   let max: CursorDimensions = { width: 0, height: 0, hotX: 0, hotY: 0 };
   const processed: Record<string, Frame> = {};
@@ -177,25 +176,7 @@ function convert(cursor: Cursor): CursorInfo {
     }
   }
 
-  return { max, frameData, size: Math.max(max.width, max.height), name };
-}
-
-function convertCursor(type: 'xcursor' | 'gif', cursor: Cursor) {
-  let info = convert(cursor);
-  const { name, aliases } = cursor;
-
-  if (type !== 'gif' && aliases)
-    for (let alias of aliases) symlinkSync(name, alias);
-
-  console.log(`    Generating ${name}...`);
-  switch (type) {
-    case 'xcursor':
-      xcursor(info);
-      break;
-    case 'gif':
-      gif(info);
-      break;
-  }
+  return { max, frameData, size: Math.max(max.width, max.height) };
 }
 
 function generate(type: 'xcursor' | 'gif') {
@@ -223,8 +204,24 @@ function generate(type: 'xcursor' | 'gif') {
   for (let [path, target] of Object.entries(Cursors.aliases))
     symlinkSync(target, path);
 
-  for (let [name, entry] of Object.entries(Cursors.cursors))
-    convertCursor(type, { name, ...entry });
+  for (let [name, entry] of Object.entries(Cursors.cursors)) {
+    const { aliases } = entry as Cursor;
+    const cursor = { name, ...entry };
+    let info = convert(cursor);
+
+    if (type !== 'gif' && aliases)
+      for (let alias of aliases) symlinkSync(name, alias);
+
+    console.log(`    Generating ${name}...`);
+    switch (type) {
+      case 'xcursor':
+        xcursor(cursor, info);
+        break;
+      case 'gif':
+        gif(cursor, info);
+        break;
+    }
+  }
 
   console.info('\nGeneration completed.');
 
@@ -236,7 +233,7 @@ function scale_percent(a: number, b: string) {
   return Math.round((a * Number(b.slice(0, -1))) / 100);
 }
 
-function xcursor({ max, size, frameData, name }: CursorInfo) {
+function xcursor({ name }: Cursor, { max, size, frameData }: CursorInfo) {
   const configLines: string[] = [];
   for (let s = 0; s < Cursors.sizes.length; s++) {
     let scale = Cursors.sizes[s];
@@ -270,7 +267,7 @@ function xcursor({ max, size, frameData, name }: CursorInfo) {
   execSync(`xcursorgen - ${name}`, { input: configLines.join('\n') });
 }
 
-function gif({ name, frameData, max }: CursorInfo) {
+function gif({ name }: Cursor, { frameData, max }: CursorInfo) {
   appendFileSync(
     join(DIR, 'previews.md'),
     `${name}|![${name}](previews/${name}.gif)\n`,
