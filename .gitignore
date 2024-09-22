@@ -1,3 +1,4 @@
 .idea
 node_modules/
-hand-of-evil.tar.gz
+/hand-of-evil/
+/hand-of-evil.tar.gz

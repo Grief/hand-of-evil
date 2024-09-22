@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "xcursor": "./hand-of-evil.ts xcursor",
-    "previews": "./hand-of-evil.ts gif"
+    "gif": "./hand-of-evil.ts gif"
   },
   "devDependencies": {
     "@types/node": "latest",

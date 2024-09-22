@@ -1,0 +1,169 @@
+{
+  "sizes":    ["200%", "100%", "48.19%", "38.55%", "28.91%"],
+  "sizesPx":  ["166", "83", "40", "32", "24"],
+  "fileName": "hnd_%s%04d.png",
+  "fileMask": "hnd_%s%s.png",
+  "aliases":  {
+    "hnd_dropcreature0042.png": "hnd_holdcreature0042.png",
+    "hnd_possess0001.png":      "hnd_possess.png"
+  },
+  "effects":  {
+    "outline": "\\(  +clone -blur x1 +level-colors white \\) -compose DstOver -composite"
+  },
+  "cursors":  {
+    "cross":          {
+      "aliases":  ["crosshair", "color-picker", "X_cursor"],
+      "frames":   ["1"],
+      "hotPoint": [31, 32],
+      "prefix":   "possess",
+      "extra":    "-draw 'point 30,32 point 31,31 point 32,32 point 31,33'"
+    },
+    "zoom-in":        {
+      "aliases":  ["f41c0e382c94c0958e07017e42b00462"],
+      "frames":   ["42:300", "43:80", "44:80", "45:80", "46:80", "47:300"],
+      "hotPoint": [25, 66],
+      "prefix":   "dropcreature"
+    },
+    "zoom-out":       {
+      "aliases":  ["f41c0e382c97c0938e07017e42800402"],
+      "frames":   ["42:300", "47:300", "46:80", "45", "44", "43"],
+      "hotPoint": [25, 66],
+      "prefix":   "dropcreature"
+    },
+    "pointing_hand":  {
+      "aliases":  ["pointer", "hand2"],
+      "frames":   ["40:600", "41:60", "42:60", "43:60", "44:30", "43", "42", "41"],
+      "hotPoint": [23, 67],
+      "prefix":   "dance"
+    },
+    "dnd-move":       {
+      "frames":   ["40:60", "41", "42", "43", "44", "45", "44", "43", "42", "41"],
+      "hotPoint": [41, 92],
+      "prefix":   "grab"
+    },
+    "wait":           {
+      "aliases":  ["watch"],
+      "frames":   ["*:30"],
+      "hotPoint": [24, 63],
+      "prefix":   "idle"
+    },
+    "pirate":         {
+      "frames":   ["40:600", "41:180", "*:30"],
+      "hotPoint": [23, 68],
+      "prefix":   "slap"
+    },
+    "left_ptr_watch": {
+      "aliases":  ["progress"],
+      "frames":   ["40:600", "*:30"],
+      "hotPoint": [23, 67],
+      "prefix":   "dance"
+    },
+    "forbidden":      {
+      "aliases":  ["03b6e0fcb3499374a867c041f52298f0", "not-allowed"],
+      "frames":   ["44"],
+      "hotPoint": [31, 72],
+      "prefix":   "dance"
+    },
+    "vertical-text":  {
+      "aliases":  ["048008013003cff3c00c801001200000"],
+      "frames":   ["52"],
+      "hotPoint": [22, 51],
+      "prefix":   "dance",
+      "angle":    -90
+    },
+    "size_ver":       {
+      "aliases":  ["row-resize", "top_side", "bottom_side", "split_v", "sb_v_double_arrow", "n-resize", "s-resize", "ns-resize", "size_all", "fleur"],
+      "frames":   ["42"],
+      "hotPoint": [25, 66],
+      "prefix":   "holdcreature"
+    },
+    "size_hor":       {
+      "aliases":  ["col-resize", "left_side", "right_side", "split_h", "sb_h_double_arrow", "e-resize", "w-resize", "ew-resize"],
+      "frames":   ["42"],
+      "hotPoint": [25, 66],
+      "prefix":   "holdcreature",
+      "angle":    -90
+    },
+    "size_fdiag":     {
+      "aliases":  ["top_left_corner", "bottom_right_corner", "nw-resize", "se-resize"],
+      "frames":   ["42"],
+      "hotPoint": [25, 66],
+      "prefix":   "holdcreature",
+      "angle":    -45
+    },
+    "size_bdiag":     {
+      "aliases":  ["top_right_corner", "bottom_left_corner", "ne-resize", "sw-resize"],
+      "frames":   ["42"],
+      "hotPoint": [25, 66],
+      "prefix":   "holdcreature",
+      "angle":    45
+    },
+    "left_ptr":       {
+      "frames":   ["40"],
+      "hotPoint": [23, 67],
+      "prefix":   "point"
+    },
+    "question_arrow": {
+      "aliases":  ["whats_this"],
+      "frames":   ["41"],
+      "hotPoint": [43, 22],
+      "prefix":   "usedigger"
+    },
+    "dnd-none":       {
+      "aliases":  ["no-drop"],
+      "frames":   ["40"],
+      "hotPoint": [45, 62],
+      "prefix":   "holdgold"
+    },
+    "text":           {
+      "aliases":  ["ibeam", "xterm"],
+      "frames":   ["52"],
+      "hotPoint": [22, 51],
+      "prefix":   "dance"
+    },
+    "openhand":       {
+      "aliases":  ["all-scroll"],
+      "frames":   ["51"],
+      "hotPoint": [41, 38],
+      "prefix":   "castspell"
+    },
+    "closedhand":     {
+      "aliases":  ["grabbing"],
+      "frames":   ["51"],
+      "hotPoint": [43, 35],
+      "prefix":   "slap"
+    },
+    "copy":           {
+      "aliases":  ["dnd-copy"],
+      "frames":   ["40:60", "41", "42", "43", "44", "45", "44", "43", "42", "41"],
+      "hotPoint": [41, 92],
+      "prefix":   "grab",
+      "extra":    "-fill white -draw 'rectangle 70,75 81,90 rectangle 67,78 78,93' -strokewidth 0.5 -stroke black -draw 'rectangle 71,76 80,89 rectangle 68,79 77,92'"
+    },
+    "alias":          {
+      "aliases":  ["dnd-link"],
+      "frames":   ["40:60", "41", "42", "43", "44", "45", "44", "43", "42", "41"],
+      "hotPoint": [41, 92],
+      "prefix":   "grab",
+      "extra":    "-fill white -draw 'rectangle 68,77 83,92' -strokewidth 0.5 -stroke black -draw 'rectangle 69,78 82,91' -fill black -stroke none +antialias -draw 'polygon 73,80 80,80 80,87 78,85 74,89 71,86 75,82'"
+    },
+    "plus":           {
+      "frames":   ["40"],
+      "hotPoint": [23, 67],
+      "prefix":   "point",
+      "extra":    "-fill white -draw 'rectangle 30,78 37,93 rectangle 26,82 41,89' -strokewidth 0.5 -stroke black -draw 'polygon 31,79 36,79 36,83 40,83 40,88 36,88 36,92 31,92 31,88 27,88 27,83 31,83'"
+    },
+    "context-menu":   {
+      "frames":   ["40"],
+      "hotPoint": [23, 67],
+      "prefix":   "point",
+      "extra":    "-fill white -draw 'rectangle 27,77 40,94' -strokewidth 0.5 -stroke black -draw 'rectangle 28,78 39,93 line 30,81 37,81 line 30,84 37,84 line 30,87 37,87 line 30,90 37,90'"
+    },
+    "right_ptr":      {
+      "frames":   ["40"],
+      "hotPoint": [23, 67],
+      "prefix":   "point",
+      "flop":     "-flop"
+    }
+  }
+}
